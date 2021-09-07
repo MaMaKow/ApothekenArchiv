@@ -20,7 +20,7 @@ public class MainMenu extends JFrame {
 
         cardPanel = new JPanel();
         cardPanel.setLayout(cardLayout);
-        ausgangsstoffPanel = new JPanel();
+        ausgangsstoffPanel = new IdentArchiv();
         plausiJPanel = new PlausibilitätsArchiv();
         startPanelLabel = new JLabel("Dies ist das startPanel");
         centerJLabel = new JLabel("Bitte wählen Sie eine der obigen Optionen.");
@@ -77,6 +77,18 @@ public class MainMenu extends JFrame {
         add(cardPanel, BorderLayout.NORTH);
 
         pack();
+    }
+
+    public CardLayout getLayout() {
+        return cardLayout;
+    }
+
+    public JPanel getCardPanel() {
+        return cardPanel;
+    }
+
+    public void showPanel(String panelName) {
+        cardLayout.show(cardPanel, panelName);
     }
 
     public static void main(String[] args) {

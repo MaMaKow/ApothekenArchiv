@@ -17,6 +17,8 @@
  */
 package com.apothekeammarienplatz.apothekenarchiv;
 
+import javax.swing.SwingUtilities;
+
 /**
  *
  * @author asys
@@ -107,12 +109,10 @@ public class IdentArchiv extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        //go back to startJPanelName
-        System.out.println(this.getAccessibleContext());
-        
-        //cardLayout.show(cardPanel, "startJPanelName");
-    }//GEN-LAST:event_cancelButtonActionPerformed
+        MainMenu mainMenuFrame = (MainMenu) SwingUtilities.getRoot(this);
+        mainMenuFrame.showPanel("startJPanelName");
 
+    }//GEN-LAST:event_cancelButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;

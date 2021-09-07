@@ -17,8 +17,14 @@
  */
 package com.apothekeammarienplatz.apothekenarchiv;
 
+import java.awt.CardLayout;
+import javax.accessibility.Accessible;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -49,6 +55,12 @@ public class PlausibilitätsArchiv extends javax.swing.JPanel {
         resultLabel = new javax.swing.JLabel();
         startButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
+
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                formComponentShown(evt);
+            }
+        });
 
         jLabel1.setText("Plausibilitätsprotokolle werden archiviert, rechtssicher signiert und in die Versionskontrolle aufgenommen.");
 
@@ -82,7 +94,7 @@ public class PlausibilitätsArchiv extends javax.swing.JPanel {
 
         resultLabel.setText("...");
 
-        startButton.setText("StartText");
+        startButton.setText("Scannen");
         startButton.setActionCommand("StartCommand");
         startButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -90,7 +102,12 @@ public class PlausibilitätsArchiv extends javax.swing.JPanel {
             }
         });
 
-        cancelButton.setText("EndeText");
+        cancelButton.setText("Zurück");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -107,12 +124,12 @@ public class PlausibilitätsArchiv extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(resultLabel)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(plausiNummernTextField)
-                                    .addComponent(copyEncryptedCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel2)))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                    .addComponent(plausiNummernTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(jLabel2))
+                                .addComponent(copyEncryptedCheckBox)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -179,6 +196,15 @@ public class PlausibilitätsArchiv extends javax.swing.JPanel {
         System.out.println(evt.getKeyChar());
         System.out.println(plausiNummernTextField.getText());
     }//GEN-LAST:event_plausiNummernTextFieldKeyTyped
+
+    private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+        plausiNummernTextField.requestFocus();
+    }//GEN-LAST:event_formComponentShown
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        MainMenu mainMenuFrame = (MainMenu) SwingUtilities.getRoot(this);
+        mainMenuFrame.showPanel("startJPanelName");
+    }//GEN-LAST:event_cancelButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
