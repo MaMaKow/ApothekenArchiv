@@ -28,3 +28,10 @@ hs_err_pid*
 *.properties
 target/
 
+Stoffe/Download_*.json
+
+# IDE files
+.classpath
+.project
+.settings/
+target/

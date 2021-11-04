@@ -58,4 +58,44 @@ public class ReadPropertyFile {
         return null;
     }
 
+    public String getDatabaseUser() {
+        String property = properties.getProperty("databaseUser");
+        if (null != property) {
+            return property;
+        }
+        return null;
+    }
+
+    public String getDatabaseName() {
+        String property = properties.getProperty("databaseName");
+        if (null != property) {
+            return property;
+        }
+        return null;
+    }
+
+    public String getDatabaseHost() {
+        String property = properties.getProperty("databaseHost");
+        if (null != property) {
+            return property;
+        }
+        return null;
+    }
+
+    public String getDatabasePort() {
+        String property = properties.getProperty("databasePort");
+        if (null != property) {
+            return property;
+        }
+        return "3306";
+    }
+
+    public String getStoffJsonPath() {
+        String property = properties.getProperty("stoffJsonPath");
+        if (null != property) {
+            return property;
+        }
+        return null;
+    }
+
 }
