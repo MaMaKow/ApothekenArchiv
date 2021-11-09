@@ -29,30 +29,33 @@ public class StoffJsonParser {
     }
 
     public StoffJsonParser() {
-        System.out.println("Doing");
-        try {
-            ReadPropertyFile readPropertyFile = new ReadPropertyFile();
-            String path = readPropertyFile.getStoffJsonPath();
-            //System.out.println(path);
-            String fileName = "Download_A.json";
-            //String content = Files.readString(Paths.get(path + fileName), StandardCharsets.US_ASCII);
-            //System.out.println(content);
-            File jsonInputFile = new File(path + fileName);
-            FileInputStream fileInputStream = new FileInputStream(jsonInputFile);
-            try (JsonReader jsonReader = Json.createReader(fileInputStream)) {
-                JsonObject jsonObject = jsonReader.readObject();
-                System.out.println(jsonObject.toString());
-                JsonArray jsonArray = jsonObject.getJsonArray("result");
-                stoffListe = new HashMap();
-                for (int i = 0; i < jsonArray.size(); i++) {
-                    JsonObject stoffJson = jsonArray.getJsonObject(i);
+        stoffListe = new HashMap();
+        ReadPropertyFile readPropertyFile = new ReadPropertyFile();
+        String path = readPropertyFile.getStoffJsonPath();
 
-                    stoffListe.put(stoffJson.getInt("uid"), stoffJson.getString("name"));
+        File folder = new File(path);
+        File[] listOfFiles = folder.listFiles();
+
+        for (File jsonInputFile : listOfFiles) {
+            if (jsonInputFile.isFile()) {
+                try {
+                    FileInputStream fileInputStream = new FileInputStream(jsonInputFile);
+                    try (JsonReader jsonReader = Json.createReader(fileInputStream)) {
+                        JsonObject jsonObject = jsonReader.readObject();
+                        JsonArray jsonArray = jsonObject.getJsonArray("result");
+
+                        System.out.println(jsonInputFile.getName());
+                        for (int i = 0; i < jsonArray.size(); i++) {
+                            JsonObject stoffJson = jsonArray.getJsonObject(i);
+                            Integer uid = Integer.valueOf(stoffJson.getString("uid"));
+                            String name = stoffJson.getString("name");
+                            stoffListe.put(uid, name);
+                        }
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(StoffJsonParser.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
             }
-        } catch (IOException ex) {
-            Logger.getLogger(StoffJsonParser.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

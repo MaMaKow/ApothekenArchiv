@@ -17,12 +17,16 @@
  */
 package com.apothekeammarienplatz.apothekenarchiv;
 
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -35,10 +39,60 @@ public class DatabaseWrapper {
     private PreparedStatement preparedStatement = null;
     private ResultSet resultSet = null;
 
-    public static void main(String[] args) throws Exception {
-        DatabaseWrapper databaseWrapper = new DatabaseWrapper();
-        databaseWrapper.readDataBase();
+    public DatabaseWrapper() {
+        try {
+            /**
+             * Read database parameters:
+             */
+            ReadPropertyFile readPropertyFile = new ReadPropertyFile();
+            String databasePassword = readPropertyFile.getDatabasePassword();
+            String databaseUser = readPropertyFile.getDatabaseUser();
+            String databaseHost = readPropertyFile.getDatabaseHost();
+            String databaseName = readPropertyFile.getDatabaseName();
+            // This will load the MySQL driver, each DB has its own driver
+            //Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            // Setup the connection with the DB
+            connect = DriverManager.getConnection("jdbc:mysql://" + databaseHost + "/" + databaseName + "?" + "user=" + databaseUser + "&password=" + databasePassword);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(DatabaseWrapper.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseWrapper.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
+    }
+
+    /**
+     *
+     * @param sqlQuery
+     * @return prepared statement
+     */
+    public PreparedStatement prepareStatement(String sqlQuery) {
+        try {
+            preparedStatement = connect.prepareStatement(sqlQuery);
+            return preparedStatement;
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseWrapper.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            //close();
+        }
+        return preparedStatement;
+    }
+
+    public ResultSet runQuery(String sqlQuery, List<String> argumentArray) {
+        try {
+            preparedStatement = prepareStatement(sqlQuery);
+            for (int i = 1; i < argumentArray.size(); i++) {
+                preparedStatement.setString(i, argumentArray.get(i));
+            }
+            resultSet = preparedStatement.executeQuery();
+            return resultSet;
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseWrapper.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            close();
+        }
+        return resultSet;
     }
 
     public void readDataBase() throws Exception {
@@ -60,8 +114,7 @@ public class DatabaseWrapper {
             writeResultSet(resultSet);
 
             // PreparedStatements can use variables and are more efficient
-            preparedStatement = connect
-                    .prepareStatement("insert into stoffe values (?, ?)");
+            preparedStatement = connect.prepareStatement("insert into stoffe values (?, ?)");
             // "myuser, webpage, datum, summary, COMMENTS from feedback.comments");
             // Parameters start with 1
             preparedStatement.setInt(1, 1234);
@@ -91,7 +144,7 @@ public class DatabaseWrapper {
     }
 
     // You need to close the resultSet
-    private void close() {
+    public void close() {
         try {
             if (resultSet != null) {
                 resultSet.close();
