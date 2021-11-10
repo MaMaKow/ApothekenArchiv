@@ -17,9 +17,11 @@
  */
 package com.apothekeammarienplatz.apothekenarchiv;
 
+import com.sun.source.tree.CaseTree;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,7 +36,6 @@ public class ScannerWrapper {
     String napsScanProfile;
     String pathToArchive;
     String naps_scan_bin;
-    String exif_tool_bin;
     /**
      * <p lang=de>Dateiname</p>
      */
@@ -45,20 +46,25 @@ public class ScannerWrapper {
      */
     HashMap scanCommandOutputStringsMap;
 
-    public ScannerWrapper(String fileName) {
-
+    public ScannerWrapper(String fileName, String subDirectoryString) throws Exception {
+        switch (subDirectoryString) {
+            case "Herstellungsanweisungen":
+            case "Herstellungsprotokolle":
+            case "Plausibilitätsprüfungen":
+            case "Prüfprotokolle":
+                break;
+            default:
+                throw new Exception("Kein gültiges Verzeichnis. Es sind nur ausgewählte Verzeichnisse erlaubt.");
+        }
+        ReadPropertyFile readPropertyFile = new ReadPropertyFile();
+        pathToArchive = readPropertyFile.getPathToArchive();
         fileNameString = fileName;
         napsScanProfile = "fi-7160_grau";
-        //pathToArchive = "C:\\Users\\Apothekenadmin\\Documents\\Qsync\\Rezeptur\\Dokumentation\\";
-        pathToArchive = "";
         naps_scan_bin = "C:\\Program Files (x86)\\NAPS2\\NAPS2.Console.exe";
-        exif_tool_bin = "C:\\Users\\Apothekenadmin\\Documents\\Qsync\\Mitarbeiter persönlich\\Mandelkow\\Anwendungen\\Abholerarchiv\\exiftool.exe";
+        targetPathString = pathToArchive + subDirectoryString + "\\" + fileNameString;
 
-        targetPathString = pathToArchive + fileNameString;
-
-        String scanCommandString = naps_scan_bin + " -o " + targetPathString + " --enableocr --profile " + napsScanProfile + " --ocrlang deu";
-        HashMap scanCommandOutputStringsMap = runProcess(scanCommandString);
-
+        String scanCommandString = naps_scan_bin + " -o \"" + targetPathString + "\" --enableocr --profile " + napsScanProfile + " --ocrlang deu";
+        scanCommandOutputStringsMap = runProcess(scanCommandString);
     }
 
     private HashMap runProcess(String command) {

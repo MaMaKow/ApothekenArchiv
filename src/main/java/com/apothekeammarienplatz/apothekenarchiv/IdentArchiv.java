@@ -17,6 +17,13 @@
  */
 package com.apothekeammarienplatz.apothekenarchiv;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
 
 /**
@@ -25,11 +32,31 @@ import javax.swing.SwingUtilities;
  */
 public class IdentArchiv extends javax.swing.JPanel {
 
+    private DefaultListModel listModel;
+
     /**
      * Creates new form IdentArchiv
      */
     public IdentArchiv() {
         initComponents();
+    }
+
+    private Map<Integer, String> getStoffListe(String stoffNameTeil) {
+        StoffDatabaseReader stoffDatabaseReader = new StoffDatabaseReader();
+        Map<Integer, String> stoffListe = stoffDatabaseReader.getStoffListe(stoffNameTeil);
+        return stoffListe;
+    }
+
+    private String vorschlagenChargenNummer() {
+        Date heute = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY MM dd", Locale.GERMANY);
+        /**
+         * TODO: Statt der "1" könnte man direkt den nächsten noch nicht
+         * verwendeten int verwenden. Dazu müsste das Programm eine Datenbank zu
+         * den bereits durchgeführten Prüfungen führen.
+         */
+        String chargenNummer = simpleDateFormat.format(heute) + " - " + "1";
+        return chargenNummer;
     }
 
     /**
@@ -47,16 +74,40 @@ public class IdentArchiv extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         startButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList<>();
 
-        jTextField1.setText("jTextField1");
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextField1KeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jTextField1KeyTyped(evt);
+            }
+        });
 
         jLabel1.setText("Stoffname");
 
-        jTextField2.setText("jTextField2");
+        jTextField2.setText(vorschlagenChargenNummer());
+        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField2ActionPerformed(evt);
+            }
+        });
 
         jLabel2.setText("Chargennummer");
 
         startButton.setText("Start");
+        startButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                startButtonActionPerformed(evt);
+            }
+        });
 
         cancelButton.setText("Abbruch");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
@@ -64,6 +115,20 @@ public class IdentArchiv extends javax.swing.JPanel {
                 cancelButtonActionPerformed(evt);
             }
         });
+
+        Map<Integer, String> stoffListe = getStoffListe("");
+        listModel = new DefaultListModel();
+        listModel.addAll(stoffListe.values());
+        jList1.setModel(listModel
+        );
+        jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jList1.setVisibleRowCount(5);
+        jList1.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList1ValueChanged(evt);
+            }
+        });
+        jScrollPane1.setViewportView(jList1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -77,16 +142,17 @@ public class IdentArchiv extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(cancelButton))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jTextField2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel2))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jTextField1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel1))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jLabel2)))
-                        .addGap(0, 223, Short.MAX_VALUE)))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 84, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -96,15 +162,17 @@ public class IdentArchiv extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(startButton)
                     .addComponent(cancelButton))
-                .addContainerGap(190, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -114,10 +182,58 @@ public class IdentArchiv extends javax.swing.JPanel {
 
     }//GEN-LAST:event_cancelButtonActionPerformed
 
+    private void jTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyTyped
+    }//GEN-LAST:event_jTextField1KeyTyped
+
+    private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyReleased
+        String text = jTextField1.getText();
+        Map<Integer, String> stoffListe = getStoffListe(text);
+        listModel.clear();
+        listModel.addAll(stoffListe.values());
+    }//GEN-LAST:event_jTextField1KeyReleased
+
+    private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
+        String ausgewählterStoff = jList1.getSelectedValue();
+        jTextField1.setText(ausgewählterStoff);
+    }//GEN-LAST:event_jList1ValueChanged
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField2ActionPerformed
+
+    private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
+        try {
+            String plausiNummer = jTextField2.getText();
+            String stoffName = jTextField1.getText();
+            if ("".equals(stoffName)) {
+                return;
+            }
+            boolean copyEncrypted = false;//TODO: Sollte hier eine Auswahl möglich sein?
+            String fileNameString;
+            fileNameString = stoffName + " " + plausiNummer + ".pdf";
+            System.out.println("fileNameString:");
+            System.out.println(fileNameString);
+            System.out.println("Versuche zu scannen:");
+            ScannerWrapper scannerWrapper = new ScannerWrapper(fileNameString, "Prüfprotokolle");
+            System.out.println(scannerWrapper.getCommandOutput());
+            System.out.println("Versuche zu signieren:");
+            CryptoWrapper cryptoWrapper = new CryptoWrapper(fileNameString, copyEncrypted);
+            System.out.println(cryptoWrapper.getCommandOutput());
+        } catch (Exception ex) {
+            Logger.getLogger(IdentArchiv.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_startButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JList<String> jList1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JButton startButton;

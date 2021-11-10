@@ -18,6 +18,8 @@
 package com.apothekeammarienplatz.apothekenarchiv;
 
 import java.awt.CardLayout;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.accessibility.Accessible;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -155,33 +157,37 @@ public class PlausibilitätsArchiv extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
-        String plausiNummer = (String) plausiNummernTextField.getValue();
-        boolean copyEncrypted = copyEncryptedCheckBox.isSelected();
-        String fileNameString;
-        fileNameString = plausiNummer + ".pdf";
-        System.out.println("fileNameString:");
-        System.out.println(fileNameString);
-        System.out.println("Versuche zu scannen:");
-        ScannerWrapper scannerWrapper = new ScannerWrapper(fileNameString);
-        System.out.println(scannerWrapper.getCommandOutput());
-        System.out.println("Versuche zu signieren:");
-        CryptoWrapper cryptoWrapper = new CryptoWrapper(fileNameString, copyEncrypted);
-        System.out.println(cryptoWrapper.getCommandOutput());
-        // Erzeugung eines neuen Frames mit
-        // dem Titel Beispiel JDialog
-        JDialog meinJDialog = new JDialog();
-        // Titel wird gesetzt
-        meinJDialog.setTitle("Mein JDialog Beispiel");
-        // Breite und Höhe des Fensters werden
-        // auf 200 Pixel gesetzt
-        meinJDialog.setSize(200, 200);
-        // Dialog wird auf modal gesetzt
-        meinJDialog.setModal(true);
-        // Hinzufügen einer Komponente,
-        // in diesem Fall ein JLabel
-        meinJDialog.add(new JLabel("Hier funktioniert noch nichts."));
-        // Wir lassen unseren Dialog anzeigen
-        meinJDialog.setVisible(true);
+        try {
+            String plausiNummer = (String) plausiNummernTextField.getValue();
+            boolean copyEncrypted = copyEncryptedCheckBox.isSelected();
+            String fileNameString;
+            fileNameString = plausiNummer + ".pdf";
+            System.out.println("fileNameString:");
+            System.out.println(fileNameString);
+            System.out.println("Versuche zu scannen:");
+            ScannerWrapper scannerWrapper = new ScannerWrapper(fileNameString, "Plausibilitätsprüfungen");
+            System.out.println(scannerWrapper.getCommandOutput());
+            System.out.println("Versuche zu signieren:");
+            CryptoWrapper cryptoWrapper = new CryptoWrapper(fileNameString, copyEncrypted);
+            System.out.println(cryptoWrapper.getCommandOutput());
+            // Erzeugung eines neuen Frames mit
+            // dem Titel Beispiel JDialog
+            JDialog meinJDialog = new JDialog();
+            // Titel wird gesetzt
+            meinJDialog.setTitle("Mein JDialog Beispiel");
+            // Breite und Höhe des Fensters werden
+            // auf 200 Pixel gesetzt
+            meinJDialog.setSize(200, 200);
+            // Dialog wird auf modal gesetzt
+            meinJDialog.setModal(true);
+            // Hinzufügen einer Komponente,
+            // in diesem Fall ein JLabel
+            meinJDialog.add(new JLabel("Hier funktioniert noch nichts."));
+            // Wir lassen unseren Dialog anzeigen
+            meinJDialog.setVisible(true);
+        } catch (Exception ex) {
+            Logger.getLogger(PlausibilitätsArchiv.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_startButtonActionPerformed
 
     private void copyEncryptedCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyEncryptedCheckBoxActionPerformed

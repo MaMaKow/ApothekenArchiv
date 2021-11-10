@@ -98,4 +98,12 @@ public class ReadPropertyFile {
         return null;
     }
 
+    public String getPathToArchive() {
+        String property = properties.getProperty("pathToArchive");
+        if (null != property) {
+            return property;
+        }
+        return null;
+    }
+
 }
