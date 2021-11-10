@@ -17,11 +17,9 @@
  */
 package com.apothekeammarienplatz.apothekenarchiv;
 
-import com.sun.source.tree.CaseTree;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,7 +61,7 @@ public class ScannerWrapper {
         naps_scan_bin = "C:\\Program Files (x86)\\NAPS2\\NAPS2.Console.exe";
         targetPathString = pathToArchive + subDirectoryString + "\\" + fileNameString;
 
-        String scanCommandString = naps_scan_bin + " -o \"" + targetPathString + "\" --enableocr --profile " + napsScanProfile + " --ocrlang deu";
+        String scanCommandString = naps_scan_bin + " -o \"" + targetPathString + "\" --enableocr --profile " + napsScanProfile + " --ocrlang deu --verbose";
         scanCommandOutputStringsMap = runProcess(scanCommandString);
     }
 
@@ -102,7 +100,7 @@ public class ScannerWrapper {
         for (Integer key : map.keySet()) {
             mapAsString.append(key + "=" + map.get(key) + ", ");
         }
-        mapAsString.delete(mapAsString.length() - 2, mapAsString.length()).append("}");
+        mapAsString.append("}");
         return mapAsString.toString();
     }
 }

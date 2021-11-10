@@ -76,6 +76,8 @@ public class IdentArchiv extends javax.swing.JPanel {
         cancelButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTextAreaAusgabe = new javax.swing.JTextArea();
 
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -102,14 +104,14 @@ public class IdentArchiv extends javax.swing.JPanel {
 
         jLabel2.setText("Chargennummer");
 
-        startButton.setText("Start");
+        startButton.setText("Scannen");
         startButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 startButtonActionPerformed(evt);
             }
         });
 
-        cancelButton.setText("Abbruch");
+        cancelButton.setText("Zurück");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
@@ -130,6 +132,16 @@ public class IdentArchiv extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(jList1);
 
+        jTextAreaAusgabe.setEditable(false);
+        jTextAreaAusgabe.setBackground(new java.awt.Color(240, 240, 240));
+        jTextAreaAusgabe.setColumns(20);
+        jTextAreaAusgabe.setFont(new java.awt.Font("Courier New", 0, 8)); // NOI18N
+        jTextAreaAusgabe.setLineWrap(true);
+        jTextAreaAusgabe.setRows(5);
+        jTextAreaAusgabe.setText("Ausgabe");
+        jTextAreaAusgabe.setWrapStyleWord(true);
+        jScrollPane2.setViewportView(jTextAreaAusgabe);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -144,15 +156,18 @@ public class IdentArchiv extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jTextField2)
+                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel2))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jTextField1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel1))
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 84, Short.MAX_VALUE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(28, 28, 28))
+                            .addComponent(jScrollPane2))
+                        .addGap(0, 152, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -164,11 +179,13 @@ public class IdentArchiv extends javax.swing.JPanel {
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(startButton)
                     .addComponent(cancelButton))
@@ -213,16 +230,20 @@ public class IdentArchiv extends javax.swing.JPanel {
                 return;
             }
             boolean copyEncrypted = false;//TODO: Sollte hier eine Auswahl möglich sein?
+            String subDirectoryString = "Prüfprotokolle";
             String fileNameString;
             fileNameString = stoffName + " " + plausiNummer + ".pdf";
             System.out.println("fileNameString:");
             System.out.println(fileNameString);
             System.out.println("Versuche zu scannen:");
             ScannerWrapper scannerWrapper = new ScannerWrapper(fileNameString, "Prüfprotokolle");
-            System.out.println(scannerWrapper.getCommandOutput());
+            jTextAreaAusgabe.append(System.getProperty("line.separator"));
+            jTextAreaAusgabe.append(scannerWrapper.getCommandOutput());
             System.out.println("Versuche zu signieren:");
-            CryptoWrapper cryptoWrapper = new CryptoWrapper(fileNameString, copyEncrypted);
-            System.out.println(cryptoWrapper.getCommandOutput());
+            CryptoWrapper cryptoWrapper = new CryptoWrapper(fileNameString, subDirectoryString, copyEncrypted);
+            jTextAreaAusgabe.append(System.getProperty("line.separator"));
+            jTextAreaAusgabe.append(cryptoWrapper.getCommandOutput());
+            jTextAreaAusgabe.append("Fertig");
         } catch (Exception ex) {
             Logger.getLogger(IdentArchiv.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -234,6 +255,8 @@ public class IdentArchiv extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JList<String> jList1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextArea jTextAreaAusgabe;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JButton startButton;

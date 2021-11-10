@@ -17,15 +17,10 @@
  */
 package com.apothekeammarienplatz.apothekenarchiv;
 
-import java.awt.CardLayout;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.accessibility.Accessible;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 
 /**
@@ -54,9 +49,10 @@ public class PlausibilitätsArchiv extends javax.swing.JPanel {
         plausiNummernTextField = new javax.swing.JFormattedTextField();
         jLabel2 = new javax.swing.JLabel();
         copyEncryptedCheckBox = new javax.swing.JCheckBox();
-        resultLabel = new javax.swing.JLabel();
         startButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextAreaAusgabe = new javax.swing.JTextArea();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -94,8 +90,6 @@ public class PlausibilitätsArchiv extends javax.swing.JPanel {
             }
         });
 
-        resultLabel.setText("...");
-
         startButton.setText("Scannen");
         startButton.setActionCommand("StartCommand");
         startButton.addActionListener(new java.awt.event.ActionListener() {
@@ -111,6 +105,15 @@ public class PlausibilitätsArchiv extends javax.swing.JPanel {
             }
         });
 
+        jTextAreaAusgabe.setEditable(false);
+        jTextAreaAusgabe.setBackground(new java.awt.Color(240, 240, 240));
+        jTextAreaAusgabe.setColumns(20);
+        jTextAreaAusgabe.setFont(new java.awt.Font("Courier New", 0, 8)); // NOI18N
+        jTextAreaAusgabe.setLineWrap(true);
+        jTextAreaAusgabe.setRows(5);
+        jTextAreaAusgabe.setWrapStyleWord(true);
+        jScrollPane1.setViewportView(jTextAreaAusgabe);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -124,15 +127,14 @@ public class PlausibilitätsArchiv extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(cancelButton))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(resultLabel)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                    .addComponent(plausiNummernTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(jLabel2))
-                                .addComponent(copyEncryptedCheckBox)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(plausiNummernTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel2))
+                            .addComponent(copyEncryptedCheckBox))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -146,13 +148,13 @@ public class PlausibilitätsArchiv extends javax.swing.JPanel {
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(copyEncryptedCheckBox)
-                .addGap(18, 18, 18)
-                .addComponent(resultLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 106, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(startButton)
                     .addComponent(cancelButton))
-                .addContainerGap(141, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -160,16 +162,18 @@ public class PlausibilitätsArchiv extends javax.swing.JPanel {
         try {
             String plausiNummer = (String) plausiNummernTextField.getValue();
             boolean copyEncrypted = copyEncryptedCheckBox.isSelected();
+            String subDirectoryString = "Plausibilitätsprüfungen";
             String fileNameString;
             fileNameString = plausiNummer + ".pdf";
             System.out.println("fileNameString:");
             System.out.println(fileNameString);
             System.out.println("Versuche zu scannen:");
-            ScannerWrapper scannerWrapper = new ScannerWrapper(fileNameString, "Plausibilitätsprüfungen");
+            ScannerWrapper scannerWrapper = new ScannerWrapper(fileNameString, subDirectoryString);
             System.out.println(scannerWrapper.getCommandOutput());
             System.out.println("Versuche zu signieren:");
-            CryptoWrapper cryptoWrapper = new CryptoWrapper(fileNameString, copyEncrypted);
+            CryptoWrapper cryptoWrapper = new CryptoWrapper(fileNameString, subDirectoryString, copyEncrypted);
             System.out.println(cryptoWrapper.getCommandOutput());
+
             // Erzeugung eines neuen Frames mit
             // dem Titel Beispiel JDialog
             JDialog meinJDialog = new JDialog();
@@ -217,8 +221,9 @@ public class PlausibilitätsArchiv extends javax.swing.JPanel {
     private javax.swing.JCheckBox copyEncryptedCheckBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea jTextAreaAusgabe;
     private javax.swing.JFormattedTextField plausiNummernTextField;
-    private javax.swing.JLabel resultLabel;
     private javax.swing.JButton startButton;
     // End of variables declaration//GEN-END:variables
 }

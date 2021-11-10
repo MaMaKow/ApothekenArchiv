@@ -30,28 +30,34 @@ import java.util.logging.Logger;
  */
 public class CryptoWrapper {
 
-    private String fileNameString;
-    private String pathToArchive;
-    private String targetPathString;
+    private final String fileNameString;
+    private final String pathToArchive;
+    private final String targetPathString;
 
     private HashMap cryptoCommandOutputStringsMap;
 
-    public CryptoWrapper(String fileName) {
-        this(fileName, false);
-    }
-
-    public CryptoWrapper(String fileName, Boolean storeEncryptedCopyBoolean) {
+    public CryptoWrapper(String fileName, String subDirectoryString, Boolean storeEncryptedCopyBoolean) throws Exception {
+        System.out.println("inside CryptoWrapper");
+        switch (subDirectoryString) {
+            case "Herstellungsanweisungen":
+            case "Herstellungsprotokolle":
+            case "Plausibilitätsprüfungen":
+            case "Prüfprotokolle":
+                break;
+            default:
+                throw new Exception("Kein gültiges Verzeichnis. Es sind nur ausgewählte Verzeichnisse erlaubt.");
+        }
         fileNameString = fileName;
         //pathToArchive = "C:\\Users\\Apothekenadmin\\Documents\\Qsync\\Rezeptur\\Dokumentation\\";
         pathToArchive = "";
 
-        targetPathString = pathToArchive + fileNameString;
-        String gpgCommandOnlySign = "gpg --output " + targetPathString + ".sig --detach-sig " + targetPathString;
-        String gpgCommandSignAndEncrypt = "gpg --output " + targetPathString + ".gpg --sign " + targetPathString;
+        targetPathString = pathToArchive + subDirectoryString + "\\" + fileNameString;
+        String gpgCommandOnlySign = "gpg --verbose --output \"" + targetPathString + ".sig\" --detach-sig \"" + targetPathString + "\"";
+        String gpgCommandSignAndEncrypt = "gpg --verbose --output \"" + targetPathString + ".gpg\" --sign \"" + targetPathString + "\"";
 
-        runProcess(gpgCommandOnlySign);
+        cryptoCommandOutputStringsMap = runProcess(gpgCommandOnlySign);
         if (storeEncryptedCopyBoolean) {
-            runProcess(gpgCommandSignAndEncrypt);
+            cryptoCommandOutputStringsMap.putAll(runProcess(gpgCommandSignAndEncrypt));
         }
     }
 
@@ -63,7 +69,8 @@ public class CryptoWrapper {
             Process process;
             process = run.exec(command);
             process.waitFor();
-            BufferedReader buf = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            //BufferedReader buf = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            BufferedReader buf = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
             cryptoCommandOutputStringsMap = new HashMap<Integer, String>();
             String line;
