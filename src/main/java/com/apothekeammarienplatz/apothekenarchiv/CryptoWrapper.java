@@ -18,6 +18,7 @@
 package com.apothekeammarienplatz.apothekenarchiv;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -31,8 +32,10 @@ import java.util.logging.Logger;
 public class CryptoWrapper {
 
     private final String fileNameString;
-    private final String pathToArchive;
     private final String targetPathString;
+
+    public static final String FILENAME_EXTENSION_SIGNATURE = ".sig";
+    public static final String FILENAME_EXTENSION_ENCRYPTED = ".gpg";
 
     private HashMap cryptoCommandOutputStringsMap;
 
@@ -48,12 +51,12 @@ public class CryptoWrapper {
                 throw new Exception("Kein gültiges Verzeichnis. Es sind nur ausgewählte Verzeichnisse erlaubt.");
         }
         fileNameString = fileName;
-        //pathToArchive = "C:\\Users\\Apothekenadmin\\Documents\\Qsync\\Rezeptur\\Dokumentation\\";
-        pathToArchive = "";
+        ReadPropertyFile readPropertyFile = new ReadPropertyFile();
+        String pathToArchive = readPropertyFile.getPathToArchive();
 
         targetPathString = pathToArchive + subDirectoryString + "\\" + fileNameString;
-        String gpgCommandOnlySign = "gpg --verbose --output \"" + targetPathString + ".sig\" --detach-sig \"" + targetPathString + "\"";
-        String gpgCommandSignAndEncrypt = "gpg --verbose --output \"" + targetPathString + ".gpg\" --sign \"" + targetPathString + "\"";
+        String gpgCommandOnlySign = "gpg --verbose --output \"" + targetPathString + FILENAME_EXTENSION_SIGNATURE + "\" --detach-sig \"" + targetPathString + "\"";
+        String gpgCommandSignAndEncrypt = "gpg --verbose --output \"" + targetPathString + FILENAME_EXTENSION_ENCRYPTED + "\" --sign \"" + targetPathString + "\"";
 
         cryptoCommandOutputStringsMap = runProcess(gpgCommandOnlySign);
         if (storeEncryptedCopyBoolean) {
@@ -99,5 +102,36 @@ public class CryptoWrapper {
         }
         mapAsString.append("}");
         return mapAsString.toString();
+    }
+
+    public static boolean signatureFileExists(String fileName) {
+        ReadPropertyFile readPropertyFile = new ReadPropertyFile();
+        String pathToArchive = readPropertyFile.getPathToArchive();
+        File file = new File(pathToArchive + fileName + FILENAME_EXTENSION_SIGNATURE);
+        return file.exists();
+    }
+
+    public static boolean encryptedFileExists(String fileName) {
+        ReadPropertyFile readPropertyFile = new ReadPropertyFile();
+        String pathToArchive = readPropertyFile.getPathToArchive();
+        File file = new File(pathToArchive + fileName + FILENAME_EXTENSION_ENCRYPTED);
+        return file.exists();
+    }
+
+    public static boolean deleteFile(String fileName) {
+        boolean success = true;
+        ReadPropertyFile readPropertyFile = new ReadPropertyFile();
+        String pathToArchive = readPropertyFile.getPathToArchive();
+        File signatureFile = new File(pathToArchive + fileName + FILENAME_EXTENSION_ENCRYPTED);
+        File encryptedFile = new File(pathToArchive + fileName + FILENAME_EXTENSION_SIGNATURE);
+        if (!signatureFile.delete()) {
+            /**
+             * Wir geben nur zurück, ob die Signaturdatei erfolgreich gelöscht
+             * wurde. Die verschlüsselte Datei ist optional.
+             */
+            success = false;
+        }
+        encryptedFile.delete();
+        return success;
     }
 }

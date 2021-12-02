@@ -17,6 +17,8 @@
  */
 package com.apothekeammarienplatz.apothekenarchiv;
 
+import java.nio.file.FileAlreadyExistsException;
+import java.sql.PreparedStatement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -24,6 +26,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 /**
@@ -78,6 +81,9 @@ public class IdentArchiv extends javax.swing.JPanel {
         jList1 = new javax.swing.JList<>();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextAreaAusgabe = new javax.swing.JTextArea();
+        dateiPanel = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -132,7 +138,6 @@ public class IdentArchiv extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(jList1);
 
-        jTextAreaAusgabe.setEditable(false);
         jTextAreaAusgabe.setBackground(new java.awt.Color(240, 240, 240));
         jTextAreaAusgabe.setColumns(20);
         jTextAreaAusgabe.setFont(new java.awt.Font("Courier New", 0, 8)); // NOI18N
@@ -141,6 +146,39 @@ public class IdentArchiv extends javax.swing.JPanel {
         jTextAreaAusgabe.setText("Ausgabe");
         jTextAreaAusgabe.setWrapStyleWord(true);
         jScrollPane2.setViewportView(jTextAreaAusgabe);
+
+        dateiPanel.setBackground(new java.awt.Color(0, 255, 51));
+        dateiPanel.setVisible(false);
+
+        jButton1.setText("Datei anzeigen");
+
+        jButton2.setText("Unterschrift prüfen");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout dateiPanelLayout = new javax.swing.GroupLayout(dateiPanel);
+        dateiPanel.setLayout(dateiPanelLayout);
+        dateiPanelLayout.setHorizontalGroup(
+            dateiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dateiPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(dateiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(11, Short.MAX_VALUE))
+        );
+        dateiPanelLayout.setVerticalGroup(
+            dateiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dateiPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton2)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -167,7 +205,8 @@ public class IdentArchiv extends javax.swing.JPanel {
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(28, 28, 28))
                             .addComponent(jScrollPane2))
-                        .addGap(0, 152, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(dateiPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -184,7 +223,9 @@ public class IdentArchiv extends javax.swing.JPanel {
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(dateiPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(startButton)
@@ -211,7 +252,9 @@ public class IdentArchiv extends javax.swing.JPanel {
 
     private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
         String ausgewählterStoff = jList1.getSelectedValue();
-        jTextField1.setText(ausgewählterStoff);
+        if (null != ausgewählterStoff) {
+            jTextField1.setText(ausgewählterStoff);
+        }
     }//GEN-LAST:event_jList1ValueChanged
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
@@ -224,7 +267,7 @@ public class IdentArchiv extends javax.swing.JPanel {
 
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
         try {
-            String plausiNummer = jTextField2.getText();
+            String chargenNummer = jTextField2.getText();
             String stoffName = jTextField1.getText();
             if ("".equals(stoffName)) {
                 return;
@@ -232,10 +275,11 @@ public class IdentArchiv extends javax.swing.JPanel {
             boolean copyEncrypted = false;//TODO: Sollte hier eine Auswahl möglich sein?
             String subDirectoryString = "Prüfprotokolle";
             String fileNameString;
-            fileNameString = stoffName + " " + plausiNummer + ".pdf";
+            fileNameString = stoffName + " " + chargenNummer + ".pdf";
             System.out.println("fileNameString:");
             System.out.println(fileNameString);
             System.out.println("Versuche zu scannen:");
+
             ScannerWrapper scannerWrapper = new ScannerWrapper(fileNameString, "Prüfprotokolle");
             jTextAreaAusgabe.append(System.getProperty("line.separator"));
             jTextAreaAusgabe.append(scannerWrapper.getCommandOutput());
@@ -243,14 +287,69 @@ public class IdentArchiv extends javax.swing.JPanel {
             CryptoWrapper cryptoWrapper = new CryptoWrapper(fileNameString, subDirectoryString, copyEncrypted);
             jTextAreaAusgabe.append(System.getProperty("line.separator"));
             jTextAreaAusgabe.append(cryptoWrapper.getCommandOutput());
+
+            jTextAreaAusgabe.append("<a href=" + fileNameString + ">" + fileNameString + "</a>");
+            DatabaseWrapper databaseWrapper = new DatabaseWrapper();
+            PreparedStatement preparedStatement = databaseWrapper.prepareStatement("INSERT INTO `identitätsarchiv` SET `stoffName` = ?, `chargenNummer` = ?, `dateiName` = ?, `dateiNameUnterschrift` = ?");
+            preparedStatement.setString(1, stoffName);
+            preparedStatement.setString(2, chargenNummer);
+            preparedStatement.setString(3, fileNameString);
+            preparedStatement.setString(4, fileNameString + CryptoWrapper.FILENAME_EXTENSION_SIGNATURE);
+            preparedStatement.execute();
+
             jTextAreaAusgabe.append("Fertig");
+            dateiPanel.setVisible(true);
+        } catch (FileAlreadyExistsException ex) {
+            String existingFileName = ex.getFile();
+            /**
+             * Die Datei existiert bereits. Wir erstellen eine Frage an den
+             * Benutzer. Wenn der Benutzer es wünscht, können die alten Dateien
+             * überschrieben werden und durch neue ersetzt werden.
+             */
+            // Erzeugung eines neuen Frames mit
+            //JOptionPane overwriteOptionPane = new JOptionPane();
+            // Titel wird gesetzt
+            //overwriteOptionPane.setTitle("Datei überschreiben?");
+            int überschreibenAntwort = JOptionPane.showConfirmDialog(null, "Die Datei existiert bereits. Soll sie überschrieben werden?", "Datei überschreiben", JOptionPane.YES_NO_OPTION);
+            System.out.println(überschreibenAntwort);
+            if (1 == überschreibenAntwort) {
+                /**
+                 * Der Nutzer möchte die Datei nicht überschreiben:
+                 */
+                return;
+            }
+            if (0 == überschreibenAntwort) {
+                /**
+                 * Die alte Datei wird überschrieben. Danach kann die neue Datei
+                 * erstellt werden. Wir löschen sowohl die PDF-datei, als auch
+                 * die eventuell existierende Signatur und die verschlüsselte
+                 * Datei.
+                 */
+                //JOptionPane.showConfirmDialog(null, existingFileName, "Delete!", JOptionPane.DEFAULT_OPTION);
+                boolean deleteSuccess = ScannerWrapper.deleteFile(existingFileName);
+                System.out.println(deleteSuccess);
+                /**
+                 * Achtung Rekursion! Jetzt, nach dem Löschen können wir die
+                 * gleiche Funktion noch einmal aufrufen:
+                 */
+                startButtonActionPerformed(evt);
+            }
+
         } catch (Exception ex) {
             Logger.getLogger(IdentArchiv.class.getName()).log(Level.SEVERE, null, ex);
+
         }
     }//GEN-LAST:event_startButtonActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
+    private javax.swing.JPanel dateiPanel;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JList<String> jList1;

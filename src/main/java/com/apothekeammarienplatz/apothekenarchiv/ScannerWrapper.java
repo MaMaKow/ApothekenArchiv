@@ -18,8 +18,10 @@
 package com.apothekeammarienplatz.apothekenarchiv;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,7 +62,10 @@ public class ScannerWrapper {
         napsScanProfile = "fi-7160_grau";
         naps_scan_bin = "C:\\Program Files (x86)\\NAPS2\\NAPS2.Console.exe";
         targetPathString = pathToArchive + subDirectoryString + "\\" + fileNameString;
-
+        File file = new File(targetPathString);
+        if (file.exists()) {
+            throw new FileAlreadyExistsException(targetPathString);
+        }
         String scanCommandString = naps_scan_bin + " -o \"" + targetPathString + "\" --enableocr --profile " + napsScanProfile + " --ocrlang deu --verbose";
         scanCommandOutputStringsMap = runProcess(scanCommandString);
     }
@@ -103,4 +108,20 @@ public class ScannerWrapper {
         mapAsString.append("}");
         return mapAsString.toString();
     }
+
+    public static boolean fileExists(String fileName) {
+        ReadPropertyFile readPropertyFile = new ReadPropertyFile();
+        String pathToArchive = readPropertyFile.getPathToArchive();
+        File file = new File(pathToArchive + fileName);
+        return file.exists();
+    }
+
+    public static boolean deleteFile(String fileName) {
+        ReadPropertyFile readPropertyFile = new ReadPropertyFile();
+        String pathToArchive = readPropertyFile.getPathToArchive();
+        File file = new File(pathToArchive + fileName);
+        CryptoWrapper.deleteFile(fileName);
+        return file.delete();
+    }
+
 }

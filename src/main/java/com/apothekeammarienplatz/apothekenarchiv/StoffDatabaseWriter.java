@@ -37,7 +37,7 @@ public class StoffDatabaseWriter {
     public StoffDatabaseWriter() {
 
         DatabaseWrapper databaseWrapper = new DatabaseWrapper();
-        PreparedStatement preparedStatement = databaseWrapper.prepareStatement("INSERT IGNORE INTO stoffe VALUES (?, ?)");
+        PreparedStatement preparedStatement = databaseWrapper.prepareStatement("REPLACE INTO stoffe VALUES (?, ?)");
 
         StoffJsonParser stoffJsonParser = new StoffJsonParser();
         Map<Integer, String> stoffListe = stoffJsonParser.getStoffListe();
