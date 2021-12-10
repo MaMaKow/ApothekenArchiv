@@ -17,6 +17,9 @@
  */
 package com.apothekeammarienplatz.apothekenarchiv;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.sql.PreparedStatement;
 import java.text.SimpleDateFormat;
@@ -36,6 +39,7 @@ import javax.swing.SwingUtilities;
 public class IdentArchiv extends javax.swing.JPanel {
 
     private DefaultListModel listModel;
+    private File archivedFileWithPath;
 
     /**
      * Creates new form IdentArchiv
@@ -76,14 +80,15 @@ public class IdentArchiv extends javax.swing.JPanel {
         jTextField2 = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         startButton = new javax.swing.JButton();
-        cancelButton = new javax.swing.JButton();
+        zurückButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextAreaAusgabe = new javax.swing.JTextArea();
         dateiPanel = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        dateiAnzeigenButton = new javax.swing.JButton();
+        unterschriftPrüfenButton = new javax.swing.JButton();
+        dateiLöschenButton = new javax.swing.JButton();
 
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -110,6 +115,7 @@ public class IdentArchiv extends javax.swing.JPanel {
 
         jLabel2.setText("Chargennummer");
 
+        startButton.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         startButton.setText("Scannen");
         startButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -117,10 +123,11 @@ public class IdentArchiv extends javax.swing.JPanel {
             }
         });
 
-        cancelButton.setText("Zurück");
-        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+        zurückButton.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        zurückButton.setText("Zurück");
+        zurückButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancelButtonActionPerformed(evt);
+                zurückButtonActionPerformed(evt);
             }
         });
 
@@ -147,15 +154,26 @@ public class IdentArchiv extends javax.swing.JPanel {
         jTextAreaAusgabe.setWrapStyleWord(true);
         jScrollPane2.setViewportView(jTextAreaAusgabe);
 
-        dateiPanel.setBackground(new java.awt.Color(0, 255, 51));
         dateiPanel.setVisible(false);
 
-        jButton1.setText("Datei anzeigen");
-
-        jButton2.setText("Unterschrift prüfen");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        dateiAnzeigenButton.setText("Datei anzeigen");
+        dateiAnzeigenButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                dateiAnzeigenButtonActionPerformed(evt);
+            }
+        });
+
+        unterschriftPrüfenButton.setText("Unterschrift prüfen");
+        unterschriftPrüfenButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                unterschriftPrüfenButtonActionPerformed(evt);
+            }
+        });
+
+        dateiLöschenButton.setText("Datei löschen");
+        dateiLöschenButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dateiLöschenButtonActionPerformed(evt);
             }
         });
 
@@ -166,18 +184,21 @@ public class IdentArchiv extends javax.swing.JPanel {
             .addGroup(dateiPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(dateiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(11, Short.MAX_VALUE))
+                    .addComponent(unterschriftPrüfenButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(dateiAnzeigenButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(dateiLöschenButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         dateiPanelLayout.setVerticalGroup(
             dateiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(dateiPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jButton1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(dateiAnzeigenButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(unterschriftPrüfenButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(dateiLöschenButton)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -185,13 +206,10 @@ public class IdentArchiv extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(10, 10, 10)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(startButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(cancelButton))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -200,18 +218,20 @@ public class IdentArchiv extends javax.swing.JPanel {
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jTextField1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel1))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(28, 28, 28))
-                            .addComponent(jScrollPane2))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(dateiPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addComponent(jLabel1)))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(startButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(zurückButton)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(dateiPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -223,22 +243,22 @@ public class IdentArchiv extends javax.swing.JPanel {
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(startButton)
+                    .addComponent(zurückButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(dateiPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(startButton)
-                    .addComponent(cancelButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+    private void zurückButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zurückButtonActionPerformed
         MainMenu mainMenuFrame = (MainMenu) SwingUtilities.getRoot(this);
         mainMenuFrame.showPanel("startJPanelName");
 
-    }//GEN-LAST:event_cancelButtonActionPerformed
+    }//GEN-LAST:event_zurückButtonActionPerformed
 
     private void jTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyTyped
     }//GEN-LAST:event_jTextField1KeyTyped
@@ -248,6 +268,10 @@ public class IdentArchiv extends javax.swing.JPanel {
         Map<Integer, String> stoffListe = getStoffListe(text);
         listModel.clear();
         listModel.addAll(stoffListe.values());
+        /**
+         * Wenn der Stoffname geändert wird, verschwindet das dateiPanel:
+         */
+        dateiPanel.setVisible(false);
     }//GEN-LAST:event_jTextField1KeyReleased
 
     private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
@@ -255,6 +279,10 @@ public class IdentArchiv extends javax.swing.JPanel {
         if (null != ausgewählterStoff) {
             jTextField1.setText(ausgewählterStoff);
         }
+        /**
+         * Wenn der Stoffname geändert wird, verschwindet das dateiPanel:
+         */
+        dateiPanel.setVisible(false);
     }//GEN-LAST:event_jList1ValueChanged
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
@@ -283,6 +311,7 @@ public class IdentArchiv extends javax.swing.JPanel {
             ScannerWrapper scannerWrapper = new ScannerWrapper(fileNameString, "Prüfprotokolle");
             jTextAreaAusgabe.append(System.getProperty("line.separator"));
             jTextAreaAusgabe.append(scannerWrapper.getCommandOutput());
+            archivedFileWithPath = scannerWrapper.getFileWithPath();
             System.out.println("Versuche zu signieren:");
             CryptoWrapper cryptoWrapper = new CryptoWrapper(fileNameString, subDirectoryString, copyEncrypted);
             jTextAreaAusgabe.append(System.getProperty("line.separator"));
@@ -341,15 +370,46 @@ public class IdentArchiv extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_startButtonActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void unterschriftPrüfenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_unterschriftPrüfenButtonActionPerformed
+        try {
+            Desktop.getDesktop().open(new File(archivedFileWithPath.getAbsolutePath() + CryptoWrapper.FILENAME_EXTENSION_SIGNATURE));
+        } catch (IOException ex) {
+            Logger.getLogger(IdentArchiv.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_unterschriftPrüfenButtonActionPerformed
+
+    private void dateiAnzeigenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dateiAnzeigenButtonActionPerformed
+        try {
+            Desktop.getDesktop().open(archivedFileWithPath);
+        } catch (IOException ex) {
+            Logger.getLogger(IdentArchiv.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_dateiAnzeigenButtonActionPerformed
+
+    private void dateiLöschenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dateiLöschenButtonActionPerformed
+        int löschenAntwort = JOptionPane.showConfirmDialog(null, "Soll die Datei gelöscht werden?", "Datei entfernen", JOptionPane.YES_NO_OPTION);
+        System.out.println(löschenAntwort);
+        if (1 == löschenAntwort) {
+            /**
+             * Der Nutzer möchte die Datei nicht löschen:
+             */
+            return;
+        }
+        if (0 == löschenAntwort) {
+            /**
+             * Die alte Datei wird überschrieben. Danach kann die neue Datei
+             * erstellt werden. Wir löschen sowohl die PDF-datei, als auch die
+             * eventuell existierende Signatur und die verschlüsselte Datei.
+             */
+            boolean deleteSuccess = ScannerWrapper.deleteFile(archivedFileWithPath.getAbsolutePath());
+            System.out.println(deleteSuccess);
+        }
+    }//GEN-LAST:event_dateiLöschenButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton cancelButton;
+    private javax.swing.JButton dateiAnzeigenButton;
+    private javax.swing.JButton dateiLöschenButton;
     private javax.swing.JPanel dateiPanel;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JList<String> jList1;
@@ -359,5 +419,7 @@ public class IdentArchiv extends javax.swing.JPanel {
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JButton startButton;
+    private javax.swing.JButton unterschriftPrüfenButton;
+    private javax.swing.JButton zurückButton;
     // End of variables declaration//GEN-END:variables
 }

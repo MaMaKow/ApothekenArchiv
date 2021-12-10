@@ -109,6 +109,11 @@ public class ScannerWrapper {
         return mapAsString.toString();
     }
 
+    public File getFileWithPath() {
+        File file = new File(targetPathString);
+        return file;
+    }
+
     public static boolean fileExists(String fileName) {
         ReadPropertyFile readPropertyFile = new ReadPropertyFile();
         String pathToArchive = readPropertyFile.getPathToArchive();
