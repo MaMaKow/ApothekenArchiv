@@ -40,8 +40,6 @@ public class StoffDatabaseReader {
     public Map<Integer, String> getStoffListe(String stoffNameTeil) {
         Map<Integer, String> stoffListe = new HashMap<>();
         try {
-            //System.out.println("Stoffsuche mit Bestandteil:");
-            //System.out.println(stoffNameTeil);
             PreparedStatement preparedStatement = databaseWrapper.prepareStatement("SELECT * FROM stoffe WHERE `stoffName` like ? LIMIT 50");
             preparedStatement.setString(1, '%' + stoffNameTeil + '%');
             ResultSet stoffeResultSet = preparedStatement.executeQuery();

@@ -35,3 +35,4 @@ Stoffe/Download_*.json
 .project
 .settings/
 target/
+test-output/
